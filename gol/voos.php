@@ -1,5 +1,4 @@
 <?php
-// File: latam/api_voos.php (e gol/api_voos.php)
 header('Content-Type: application/json');
 
 if ( !isset($_REQUEST['origem']) || !isset($_REQUEST['destino']) || !isset($_REQUEST['data']) ) {
@@ -10,13 +9,12 @@ if ( !isset($_REQUEST['origem']) || !isset($_REQUEST['destino']) || !isset($_REQ
 
 $origem_iata = strtoupper($_REQUEST['origem']);
 $destino_iata = strtoupper($_REQUEST['destino']);
-$data_busca = $_REQUEST['data']; // YYYY-MM-DD
+$data_busca = $_REQUEST['data'];
 
 try {
     $conexao = new PDO ('sqlite:database');
     $conexao->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // 1. Obter IDs de Destino a partir dos códigos IATA
     $stmt_origem = $conexao->prepare("SELECT id FROM destino WHERE iata = ?");
     $stmt_origem->execute([$origem_iata]);
     $origem_id = $stmt_origem->fetchColumn();
@@ -30,27 +28,14 @@ try {
         exit;
     }
 
-    // 2. Buscar voos
     $sql = "
-        SELECT
-            v.id,
-            o.iata as origem,
-            d.iata as destino,
-            v.datahora,
-            v.preco,
-            a.matricula || a.fabricante || a.modelo as aviao
-        FROM
-            voo v
-        JOIN
-            destino o ON v.origem = o.id
-        JOIN
-            destino d ON v.destino = d.id
-        JOIN
-            aviao a ON v.aviao = a.id
-        WHERE
-            o.id = :origem_id AND
-            d.id = :destino_id AND
-            STRFTIME('%Y-%m-%d', v.datahora) = :data_busca
+        SELECT v.id, o.iata as origem, d.iata as destino, v.datahora, v.preco, a.matricula || a.fabricante || a.modelo as aviao
+        FROM voo v
+        JOIN destino o ON v.origem = o.id
+        JOIN destino d ON v.destino = d.id
+        JOIN aviao a ON v.aviao = a.id
+        WHERE o.id = :origem_id AND d.id = :destino_id 
+        AND STRFTIME('%Y-%m-%d', v.datahora) = :data_busca
     ";
 
     $stmt = $conexao->prepare($sql);

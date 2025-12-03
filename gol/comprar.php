@@ -1,5 +1,4 @@
 <?php
-// File: latam/api_comprar.php (e gol/api_comprar.php)
 header('Content-Type: application/json');
 
 if ( !isset($_REQUEST['voo_id']) || !isset($_REQUEST['cpf']) || !isset($_REQUEST['nome']) ) {
@@ -17,12 +16,10 @@ try {
     $conexao->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $conexao->exec("pragma foreign_keys = ON;");
 
-    // 1. Buscar cliente por CPF
     $stmt_cliente = $conexao->prepare("SELECT id FROM cliente WHERE cpf = ?");
     $stmt_cliente->execute([$cpf]);
     $cliente_id = $stmt_cliente->fetchColumn();
 
-    // 2. Se o cliente não existir, inserir novo cliente
     if (!$cliente_id) {
         $stmt_insert = $conexao->prepare("INSERT INTO cliente (cpf, nome) VALUES (?, ?)");
         $success = $stmt_insert->execute([$cpf, $nome]);
@@ -33,11 +30,9 @@ try {
             exit;
         }
         
-        // Obter o ID do cliente recém-inserido
         $cliente_id = $conexao->lastInsertId();
     }
     
-    // 3. Inserir passageiro (registrar a compra)
     $stmt_passageiro = $conexao->prepare("INSERT INTO passageiro (voo, cliente) VALUES (?, ?)");
     $success = $stmt_passageiro->execute([$voo_id, $cliente_id]);
 
