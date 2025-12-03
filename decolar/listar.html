@@ -1,4 +1,50 @@
-		{% extends "layout.html" %}
+{% extends "layout.html" %}
 		{% block conteudo %}
-		<h2>Escolha seu Voo</h2>
+		<h2>Busca de Voos</h2>
+		
+		<form method="POST" action="/listar">
+			<p>
+				<input type="text" name="origem" placeholder="Origem (IATA, ex: BSB)" value="{{ origem if origem else '' }}" required />
+				<input type="text" name="destino" placeholder="Destino (IATA, ex: POA)" value="{{ destino if destino else '' }}" required />
+				<input type="date" name="data" value="{{ data if data else '' }}" required />
+				<button type="submit">Buscar</button>
+			</p>
+		</form>
+
+		{% if voos is not none %}
+			{% if voos|length > 0 %}
+				<h3>Voos Encontrados ({{ voos|length }} resultados)</h3>
+				<table border="1">
+					<tr>
+						<th>Operadora</th>
+						<th>Voo ID</th>
+						<th>Origem</th>
+						<th>Destino</th>
+						<th>Data/Hora</th>
+						<th>Preço</th>
+						<th>Aeronave</th>
+						<th>Ação</th>
+					</tr>
+					{% for voo in voos %}
+					<tr>
+						<td>{{ voo.operadora }}</td>
+						<td>{{ voo.id }}</td>
+						<td>{{ voo.origem }}</td>
+						<td>{{ voo.destino }}</td>
+						<td>{{ voo.datahora_formatada }}</td>
+						<td>R$ {{ voo.preco }}</td>
+						<td>{{ voo.aviao }}</td>
+						<td>
+							<a href="/comprar?decolar_id={{ voo.decolar_id }}&origem={{ voo.origem }}&destino={{ voo.destino }}&datahora={{ voo.datahora_formatada }}&operadora={{ voo.operadora }}&aviao={{ voo.aviao }}&preco={{ voo.preco }}">
+								<button>Comprar</button>
+							</a>
+						</td>
+					</tr>
+					{% endfor %}
+				</table>
+			{% else %}
+				<h3>Nenhum voo encontrado para os critérios de busca.</h3>
+			{% endif %}
+		{% endif %}
+
 		{% endblock %}

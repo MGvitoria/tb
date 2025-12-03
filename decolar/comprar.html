@@ -1,10 +1,27 @@
-		{% extends "layout.html" %}
+{% extends "layout.html" %}
 		{% block conteudo %}
 		<h2>Compre seu Voo</h2>
-        <h2>Identifique-se</h2>
-        <form>
-            <p><input type="text" name="cpf" placeholder="Digite o CPF do passageiro." /></p>
-            <p><input type="text" name="nome" placeholder="Digite o nome do passageiro." /></p>
-            <p><button type="submit" formmethod="post" formaction="/confirmar">Comprar</button></p>
-        </form>
+        
+        {% if decolar_id %}
+            <h3>Detalhes do Voo Selecionado</h3>
+            <p><strong>Operadora:</strong> {{ operadora }}</p>
+            <p><strong>Rota:</strong> {{ origem }} -> {{ destino }}</p>
+            <p><strong>Data/Hora:</strong> {{ datahora }}</p>
+            <p><strong>Aeronave:</strong> {{ aviao }}</p>
+            <p><strong>Preço:</strong> R$ {{ preco }}</p>
+            
+            <hr>
+            
+            <h2>Identifique-se</h2>
+            <form method="post" action="/confirmar">
+                <input type="hidden" name="decolar_id" value="{{ decolar_id }}" />
+                
+                <p><input type="text" name="cpf" placeholder="Digite o CPF do passageiro." required /></p>
+                <p><input type="text" name="nome" placeholder="Digite o nome do passageiro." required /></p>
+                <p><button type="submit">Comprar</button></p>
+            </form>
+        {% else %}
+            <p>Nenhum voo selecionado. <a href="/listar">Voltar para a busca</a></p>
+        {% endif %}
+
 		{% endblock %}
